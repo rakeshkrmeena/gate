@@ -846,7 +846,15 @@
 		$this.onActions[nm] = fn;
 	};
 	this.fireEvent = function(nm) {
-		eval($this.onActions[nm])($this);
+		if($this.onActions[nm]!=null) {
+			if(typeof $this.onActions[nm] === 'function') {
+				$this.onActions[nm]($this);
+			} else if(typeof $this.onActions[nm] === 'string') {
+				// Convert string to function for security
+				var fn = new Function('combobox', $this.onActions[nm]);
+				fn($this);
+			}
+		}
 	};
 	//end 
 	var updateCommonVars = function() {
