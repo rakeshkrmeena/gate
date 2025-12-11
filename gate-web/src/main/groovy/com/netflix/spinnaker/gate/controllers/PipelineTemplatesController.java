@@ -87,7 +87,7 @@ public class PipelineTemplatesController {
 
     Map<String, Object> operation = new HashMap<>();
     operation.put(
-        "description", "Create pipeline template '" + getNameFromTemplate(template) + "'");
+        "description", String.format("Create pipeline template '%s'", sanitizeTemplateName(getNameFromTemplate(template))));
     operation.put("application", getApplicationFromTemplate(template));
     operation.put("job", jobs);
 
@@ -135,7 +135,7 @@ public class PipelineTemplatesController {
 
     Map<String, Object> operation = new HashMap<>();
     operation.put(
-        "description", "Update pipeline template '" + getNameFromTemplate(template) + "'");
+        "description", String.format("Update pipeline template '%s'", sanitizeTemplateName(getNameFromTemplate(template))));
     operation.put("application", getApplicationFromTemplate(template));
     operation.put("job", jobs);
 
@@ -156,7 +156,7 @@ public class PipelineTemplatesController {
     jobs.add(job);
 
     Map<String, Object> operation = new HashMap<>();
-    operation.put("description", "Delete pipeline template '" + id + "'");
+    operation.put("description", String.format("Delete pipeline template '%s'", sanitizeTemplateName(id)));
     operation.put("application", application != null ? application : DEFAULT_APPLICATION);
     operation.put("job", jobs);
 
@@ -175,6 +175,14 @@ public class PipelineTemplatesController {
 
   static String getNameFromTemplate(PipelineTemplate template) {
     return Optional.ofNullable(template.metadata.name).orElse(template.id);
+  }
+
+  static String sanitizeTemplateName(String templateName) {
+    if (templateName == null) {
+      return "unknown";
+    }
+    // Remove potentially dangerous characters and limit length
+    return templateName.replaceAll("['\";\\\\]", "").trim().substring(0, Math.min(templateName.length(), 100));
   }
 
   static String getApplicationFromTemplate(PipelineTemplate template) {
