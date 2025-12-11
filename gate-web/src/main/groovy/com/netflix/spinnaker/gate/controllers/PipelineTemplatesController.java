@@ -64,7 +64,10 @@ public class PipelineTemplatesController {
   @ApiOperation(value = "List pipeline templates.", response = List.class)
   @RequestMapping(method = RequestMethod.GET)
   public Collection<Map> list(@RequestParam(required = false) List<String> scopes) {
-    return pipelineTemplateService.findByScope(scopes);
+    List<String> sanitizedScopes = scopes != null ? 
+        scopes.stream().map(this::sanitizeTemplateName).collect(java.util.stream.Collectors.toList()) : 
+        null;
+    return pipelineTemplateService.findByScope(sanitizedScopes);
   }
 
   @ApiOperation(value = "Create a pipeline template.", response = HashMap.class)
@@ -103,13 +106,16 @@ public class PipelineTemplatesController {
       @RequestParam String source,
       @RequestParam(required = false) String executionId,
       @RequestParam(required = false) String pipelineConfigId) {
-    return pipelineTemplateService.resolve(source, executionId, pipelineConfigId);
+    return pipelineTemplateService.resolve(
+        sanitizeTemplateName(source),
+        executionId != null ? sanitizeTemplateName(executionId) : null,
+        pipelineConfigId != null ? sanitizeTemplateName(pipelineConfigId) : null);
   }
 
   @ApiOperation(value = "Get a pipeline template.", response = HashMap.class)
   @RequestMapping(value = "/{id}", method = RequestMethod.GET)
   public Map get(@PathVariable String id) {
-    return pipelineTemplateService.get(id);
+    return pipelineTemplateService.get(sanitizeTemplateName(id));
   }
 
   @ApiOperation(value = "Update a pipeline template.", response = HashMap.class)
@@ -130,7 +136,7 @@ public class PipelineTemplatesController {
     List<Map<String, Object>> jobs = new ArrayList<>();
     Map<String, Object> job = new HashMap<>();
     job.put("type", "updatePipelineTemplate");
-    job.put("id", id);
+    job.put("id", sanitizeTemplateName(id));
     job.put("pipelineTemplate", encodeAsBase64(pipelineTemplate, objectMapper));
     job.put("user", AuthenticatedRequest.getSpinnakerUser().orElse("anonymous"));
     job.put("skipPlanDependents", skipPlanDependents);
@@ -157,7 +163,7 @@ public class PipelineTemplatesController {
     List<Map<String, Object>> jobs = new ArrayList<>();
     Map<String, Object> job = new HashMap<>();
     job.put("type", "deletePipelineTemplate");
-    job.put("pipelineTemplateId", id);
+    job.put("pipelineTemplateId", sanitizeTemplateName(id));
     job.put("user", AuthenticatedRequest.getSpinnakerUser().orElse("anonymous"));
     jobs.add(job);
 
@@ -167,7 +173,7 @@ public class PipelineTemplatesController {
     descriptionBuilder.append(sanitizeTemplateName(id));
     descriptionBuilder.append("'");
     operation.put("description", descriptionBuilder.toString());
-    operation.put("application", application != null ? application : DEFAULT_APPLICATION);
+    operation.put("application", application != null ? sanitizeTemplateName(application) : DEFAULT_APPLICATION);
     operation.put("job", jobs);
 
     return taskService.create(operation);
@@ -180,7 +186,7 @@ public class PipelineTemplatesController {
   public List<PipelineTemplateDependent> listPipelineTemplateDependents(
       @PathVariable String id,
       @RequestParam(value = "recursive", required = false) boolean recursive) {
-    return pipelineTemplateService.getTemplateDependents(id, recursive);
+    return pipelineTemplateService.getTemplateDependents(sanitizeTemplateName(id), recursive);
   }
 
   static String getNameFromTemplate(PipelineTemplate template) {
