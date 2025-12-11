@@ -654,7 +654,13 @@
 															checkMethodAndApply();
 															$("#"+childid).css({zIndex:'0'});
 															if($this.onActions["onClose"]!=null) {
-														  		eval($this.onActions["onClose"])($this);
+														  		if(typeof $this.onActions["onClose"] === 'function') {
+																	$this.onActions["onClose"]($this);
+																} else if(typeof $this.onActions["onClose"] === 'string') {
+																	// Convert string to function for security
+																	var fn = new Function('combobox', $this.onActions["onClose"]);
+																	fn($this);
+																}
 													  		};
 															});
 		
