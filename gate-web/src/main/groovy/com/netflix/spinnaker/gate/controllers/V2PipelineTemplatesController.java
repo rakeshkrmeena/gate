@@ -136,13 +136,16 @@ public class V2PipelineTemplatesController {
   /**
    * Sanitizes user input for use in description fields to prevent SQL injection.
    * Removes potentially dangerous characters and limits length.
+   * Uses a whitelist approach to only allow safe characters.
    */
   private static String sanitizeForDescription(String input) {
     if (input == null) {
       return "unknown";
     }
-    // Remove potentially dangerous characters and limit length
-    return input.replaceAll("['\";\\\\]", "").trim().substring(0, Math.min(input.length(), 100));
+    // Use whitelist approach: only allow alphanumeric characters, spaces, hyphens, underscores, and dots
+    String sanitized = input.replaceAll("[^a-zA-Z0-9\\s\\-_\\.]", "").trim();
+    // Limit length to prevent buffer overflow issues
+    return sanitized.substring(0, Math.min(sanitized.length(), 100));
   }
 
   @ApiOperation(value = "(ALPHA) Update a pipeline template.", response = HashMap.class)
