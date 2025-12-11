@@ -118,7 +118,7 @@ public class V2PipelineTemplatesController {
 
     Map<String, Object> operation = new HashMap<>();
     operation.put(
-        "description", "Create pipeline template '" + getNameFromTemplate(template) + "'");
+        "description", "Create pipeline template '" + sanitizeForDescription(getNameFromTemplate(template)) + "'");
     operation.put("application", getApplicationFromTemplate(template));
     operation.put("job", jobs);
     return operation;
@@ -131,6 +131,18 @@ public class V2PipelineTemplatesController {
     } else if (schema == null) {
       pipelineTemplate.put(SCHEMA, V2_SCHEMA_VERSION);
     }
+  }
+
+  /**
+   * Sanitizes user input for use in description fields to prevent SQL injection.
+   * Removes potentially dangerous characters and limits length.
+   */
+  private static String sanitizeForDescription(String input) {
+    if (input == null) {
+      return "unknown";
+    }
+    // Remove potentially dangerous characters and limit length
+    return input.replaceAll("['\";\\\\]", "").trim().substring(0, Math.min(input.length(), 100));
   }
 
   @ApiOperation(value = "(ALPHA) Update a pipeline template.", response = HashMap.class)
@@ -169,7 +181,7 @@ public class V2PipelineTemplatesController {
 
     Map<String, Object> operation = new HashMap<>();
     operation.put(
-        "description", "Update pipeline template '" + getNameFromTemplate(template) + "'");
+        "description", "Update pipeline template '" + sanitizeForDescription(getNameFromTemplate(template)) + "'");
     operation.put("application", getApplicationFromTemplate(template));
     operation.put("job", jobs);
     return operation;
@@ -202,7 +214,7 @@ public class V2PipelineTemplatesController {
     jobs.add(job);
 
     Map<String, Object> operation = new HashMap<>();
-    operation.put("description", "Delete pipeline template '" + id + "'");
+    operation.put("description", "Delete pipeline template '" + sanitizeForDescription(id) + "'");
     operation.put("application", application != null ? application : DEFAULT_APPLICATION);
     operation.put("job", jobs);
 
