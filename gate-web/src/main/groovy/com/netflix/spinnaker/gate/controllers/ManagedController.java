@@ -48,6 +48,7 @@ import org.springframework.web.bind.annotation.RestController;
 import retrofit.RetrofitError;
 import retrofit.client.Header;
 import retrofit.client.Response;
+import org.apache.commons.io.FilenameUtils;
 
 @Criticality(Criticality.Value.LOW)
 @RequestMapping("/managed")
@@ -389,7 +390,9 @@ public class ManagedController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   ResponseEntity<String> processNotificationCallback(
       @PathVariable String source, RequestEntity<String> request) {
-    return notificationService.processNotificationCallback(source, request, "keel");
+    // Sanitize the source parameter to prevent path traversal attacks
+    String sanitizedSource = FilenameUtils.getName(source);
+    return notificationService.processNotificationCallback(sanitizedSource, request, "keel");
   }
 
   @ApiOperation(value = "Get a report of application onboarding")
