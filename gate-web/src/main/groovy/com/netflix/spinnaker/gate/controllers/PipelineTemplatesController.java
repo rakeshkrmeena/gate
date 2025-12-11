@@ -181,9 +181,19 @@ public class PipelineTemplatesController {
     if (templateName == null) {
       return "unknown";
     }
-    // Remove potentially dangerous characters including SQL injection patterns and limit length
-    // Only allow alphanumeric, spaces, hyphens, underscores, and dots
-    String sanitized = templateName.replaceAll("[^a-zA-Z0-9\\s\\-_\\.]", "").trim();
+    // Comprehensive sanitization to prevent SQL injection and other security issues
+    // Remove all potentially dangerous characters including SQL metacharacters
+    // This ensures safe usage in string formatting and prevents tainted data issues
+    String sanitized = templateName
+        .replaceAll("[';\"\\-\\-/\\*\\*/\\\\]", "") // Remove SQL comment and quote characters
+        .replaceAll("[^a-zA-Z0-9\\s\\-_\\.]", "") // Only allow safe alphanumeric and basic punctuation
+        .replaceAll("\\s+", " ") // Normalize whitespace
+        .trim();
+    
+    // Ensure the result is not empty and limit length for safety
+    if (sanitized.isEmpty()) {
+      return "unknown";
+    }
     return sanitized.substring(0, Math.min(sanitized.length(), 100));
   }
 
