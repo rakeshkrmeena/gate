@@ -87,7 +87,7 @@ public class PipelineTemplatesController {
 
     Map<String, Object> operation = new HashMap<>();
     operation.put(
-        "description", "Create pipeline template '" + sanitizeTemplateName(getNameFromTemplate(template)) + "'");
+        "description", String.format("Create pipeline template '%s'", sanitizeTemplateName(getNameFromTemplate(template))));
     operation.put("application", getApplicationFromTemplate(template));
     operation.put("job", jobs);
 
@@ -135,7 +135,7 @@ public class PipelineTemplatesController {
 
     Map<String, Object> operation = new HashMap<>();
     operation.put(
-        "description", "Update pipeline template '" + sanitizeTemplateName(getNameFromTemplate(template)) + "'");
+        "description", String.format("Update pipeline template '%s'", sanitizeTemplateName(getNameFromTemplate(template))));
     operation.put("application", getApplicationFromTemplate(template));
     operation.put("job", jobs);
 
@@ -156,7 +156,7 @@ public class PipelineTemplatesController {
     jobs.add(job);
 
     Map<String, Object> operation = new HashMap<>();
-    operation.put("description", "Delete pipeline template '" + sanitizeTemplateName(id) + "'");
+    operation.put("description", String.format("Delete pipeline template '%s'", sanitizeTemplateName(id)));
     operation.put("application", application != null ? application : DEFAULT_APPLICATION);
     operation.put("job", jobs);
 
@@ -181,8 +181,10 @@ public class PipelineTemplatesController {
     if (templateName == null) {
       return "unknown";
     }
-    // Remove potentially dangerous characters and limit length
-    return templateName.replaceAll("['\";\\\\]", "").trim().substring(0, Math.min(templateName.length(), 100));
+    // Remove potentially dangerous characters including SQL injection patterns and limit length
+    // Only allow alphanumeric, spaces, hyphens, underscores, and dots
+    String sanitized = templateName.replaceAll("[^a-zA-Z0-9\\s\\-_\\.]", "").trim();
+    return sanitized.substring(0, Math.min(sanitized.length(), 100));
   }
 
   static String getApplicationFromTemplate(PipelineTemplate template) {
