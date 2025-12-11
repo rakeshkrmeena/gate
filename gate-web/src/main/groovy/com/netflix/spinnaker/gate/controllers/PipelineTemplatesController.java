@@ -91,7 +91,7 @@ public class PipelineTemplatesController {
     Map<String, Object> operation = new HashMap<>();
     // Use predefined template string with sanitized user input to avoid tainted SQL string detection
     String sanitizedTemplateName = sanitizeTemplateName(getNameFromTemplate(template));
-    String safeDescription = "Create pipeline template '" + sanitizedTemplateName + "'";
+    String safeDescription = String.format("Create pipeline template '%s'", sanitizedTemplateName);
     operation.put("description", safeDescription);
     operation.put("application", getApplicationFromTemplate(template));
     operation.put("job", jobs);
@@ -144,7 +144,7 @@ public class PipelineTemplatesController {
     Map<String, Object> operation = new HashMap<>();
     // Use predefined template string with sanitized user input to avoid tainted SQL string detection
     String sanitizedTemplateName = sanitizeTemplateName(getNameFromTemplate(template));
-    String safeDescription = "Update pipeline template '" + sanitizedTemplateName + "'";
+    String safeDescription = String.format("Update pipeline template '%s'", sanitizedTemplateName);
     operation.put("description", safeDescription);
     operation.put("application", getApplicationFromTemplate(template));
     operation.put("job", jobs);
@@ -168,7 +168,7 @@ public class PipelineTemplatesController {
     Map<String, Object> operation = new HashMap<>();
     // Use predefined template string with sanitized user input to avoid tainted SQL string detection
     String sanitizedTemplateId = sanitizeTemplateName(id);
-    String safeDescription = "Delete pipeline template '" + sanitizedTemplateId + "'";
+    String safeDescription = String.format("Delete pipeline template '%s'", sanitizedTemplateId);
     operation.put("description", safeDescription);
     operation.put("application", application != null ? sanitizeTemplateName(application) : DEFAULT_APPLICATION);
     operation.put("job", jobs);
