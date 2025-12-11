@@ -860,8 +860,8 @@
 		//alert("init");
 		setOriginalProperties();
 		updateCommonVars();
-		if(options.onInit!='') {
-			eval(options.onInit)($this);
+		if(typeof options.onInit === 'function') {
+			options.onInit($this);
 		};
 		
 	};
