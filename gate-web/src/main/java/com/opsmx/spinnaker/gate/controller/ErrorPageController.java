@@ -18,12 +18,13 @@ package com.opsmx.spinnaker.gate.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class ErrorPageController {
 
-  @RequestMapping("/oes/error")
+  @RequestMapping(value = "/oes/error", method = RequestMethod.GET)
   public ModelAndView getErrorPage() {
     ModelAndView modelAndView = new ModelAndView();
     modelAndView.setViewName("error");
