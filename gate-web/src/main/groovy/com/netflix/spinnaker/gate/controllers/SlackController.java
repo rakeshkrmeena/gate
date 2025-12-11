@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import retrofit.RetrofitError;
 
@@ -65,7 +66,7 @@ public class SlackController {
   }
 
   @ApiOperation("Retrieve a list of public slack channels")
-  @RequestMapping("/channels")
+  @RequestMapping(value = "/channels", method = RequestMethod.GET)
   public List<Map> getChannels() {
     return slackChannelsCache.get();
   }
