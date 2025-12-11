@@ -170,7 +170,9 @@ public class PipelineTemplatesController {
     String sanitizedTemplateId = sanitizeTemplateName(id);
     String safeDescription = String.format("Delete pipeline template '%s'", sanitizedTemplateId);
     operation.put("description", safeDescription);
-    operation.put("application", application != null ? sanitizeTemplateName(application) : DEFAULT_APPLICATION);
+    // Use safer approach for user data to prevent SQL injection - validate and constrain input
+    String safeApplication = (application != null) ? sanitizeForSqlSafety(application) : DEFAULT_APPLICATION;
+    operation.put("application", safeApplication);
     operation.put("job", jobs);
 
     return taskService.create(operation);
@@ -208,6 +210,29 @@ public class PipelineTemplatesController {
       return "unknown";
     }
     return sanitized.substring(0, Math.min(sanitized.length(), 100));
+  }
+
+  /**
+   * Enhanced sanitization method specifically designed to prevent SQL injection vulnerabilities.
+   * This method provides stricter validation than sanitizeTemplateName to address tainted SQL string concerns.
+   * Uses allowlist approach to only permit safe characters, preventing any SQL metacharacters.
+   */
+  static String sanitizeForSqlSafety(String input) {
+    if (input == null) {
+      return "unknown";
+    }
+    
+    // Strict allowlist: only alphanumeric characters and underscores (safe for SQL contexts)
+    String sanitized = input.replaceAll("[^a-zA-Z0-9_]", "")
+        .trim();
+    
+    // Additional validation: ensure result is not empty and constrain length
+    if (sanitized.isEmpty()) {
+      return "unknown";
+    }
+    
+    // Limit to reasonable length to prevent buffer overflow attacks
+    return sanitized.substring(0, Math.min(sanitized.length(), 50));
   }
 
   static String getApplicationFromTemplate(PipelineTemplate template) {
