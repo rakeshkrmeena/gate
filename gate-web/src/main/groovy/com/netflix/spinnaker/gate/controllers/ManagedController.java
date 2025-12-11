@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.SneakyThrows;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,20 +108,23 @@ public class ManagedController {
   @ApiOperation(value = "Get a resource", response = Resource.class)
   @GetMapping(path = "/resources/{resourceId}")
   Resource getResource(@PathVariable("resourceId") String resourceId) {
-    return keelService.getResource(resourceId);
+    String sanitizedResourceId = FilenameUtils.getName(resourceId);
+    return keelService.getResource(sanitizedResourceId);
   }
 
   @ApiOperation(value = "Get a resource", response = Resource.class)
   @GetMapping(path = "/resources/{resourceId}.yml", produces = APPLICATION_YAML_VALUE)
   Resource getResourceYaml(@PathVariable("resourceId") String resourceId) {
-    return keelService.getResourceYaml(resourceId);
+    String sanitizedResourceId = FilenameUtils.getName(resourceId);
+    return keelService.getResourceYaml(sanitizedResourceId);
   }
 
   @ApiOperation(value = "Get status of a resource", response = Map.class)
   @GetMapping(path = "/resources/{resourceId}/status")
   Map getResourceStatus(@PathVariable("resourceId") String resourceId) {
+    String sanitizedResourceId = FilenameUtils.getName(resourceId);
     Map<String, String> status = new HashMap<>();
-    status.put("status", keelService.getResourceStatus(resourceId));
+    status.put("status", keelService.getResourceStatus(sanitizedResourceId));
     return status;
   }
 
@@ -136,13 +140,15 @@ public class ManagedController {
   @ApiOperation(value = "Pause management of a resource")
   @PostMapping(path = "/resources/{resourceId}/pause")
   void pauseResource(@PathVariable("resourceId") String resourceId) {
-    keelService.pauseResource(resourceId, Collections.emptyMap());
+    String sanitizedResourceId = FilenameUtils.getName(resourceId);
+    keelService.pauseResource(sanitizedResourceId, Collections.emptyMap());
   }
 
   @ApiOperation(value = "Resume management of a resource")
   @DeleteMapping(path = "/resources/{resourceId}/pause")
   void resumeResource(@PathVariable("resourceId") String resourceId) {
-    keelService.resumeResource(resourceId);
+    String sanitizedResourceId = FilenameUtils.getName(resourceId);
+    keelService.resumeResource(sanitizedResourceId);
   }
 
   @ApiOperation(
