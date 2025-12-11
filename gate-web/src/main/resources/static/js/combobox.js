@@ -637,7 +637,13 @@
 			$("#"+childid).css({zIndex:options.zIndex});
 			$("#"+childid).slideDown("fast", function() {
 													  if($this.onActions["onOpen"]!=null) {
-														  eval($this.onActions["onOpen"])($this);
+														  if(typeof $this.onActions["onOpen"] === 'function') {
+															  $this.onActions["onOpen"]($this);
+														  } else if(typeof $this.onActions["onOpen"] === 'string') {
+															  // Convert string to function for security
+															  var fn = new Function('combobox', $this.onActions["onOpen"]);
+															  fn($this);
+														  }
 													  };
 													  });
 		if(childid!=msOldDiv) {
