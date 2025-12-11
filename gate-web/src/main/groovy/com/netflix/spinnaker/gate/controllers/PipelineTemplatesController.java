@@ -86,8 +86,9 @@ public class PipelineTemplatesController {
     jobs.add(job);
 
     Map<String, Object> operation = new HashMap<>();
+    String sanitizedTemplateName = sanitizeTemplateName(getNameFromTemplate(template));
     operation.put(
-        "description", String.format("Create pipeline template '%s'", sanitizeTemplateName(getNameFromTemplate(template))));
+        "description", "Create pipeline template '" + sanitizedTemplateName + "'");
     operation.put("application", getApplicationFromTemplate(template));
     operation.put("job", jobs);
 
@@ -134,8 +135,9 @@ public class PipelineTemplatesController {
     jobs.add(job);
 
     Map<String, Object> operation = new HashMap<>();
+    String sanitizedTemplateName = sanitizeTemplateName(getNameFromTemplate(template));
     operation.put(
-        "description", String.format("Update pipeline template '%s'", sanitizeTemplateName(getNameFromTemplate(template))));
+        "description", "Update pipeline template '" + sanitizedTemplateName + "'");
     operation.put("application", getApplicationFromTemplate(template));
     operation.put("job", jobs);
 
@@ -156,7 +158,8 @@ public class PipelineTemplatesController {
     jobs.add(job);
 
     Map<String, Object> operation = new HashMap<>();
-    operation.put("description", String.format("Delete pipeline template '%s'", sanitizeTemplateName(id)));
+    String sanitizedTemplateId = sanitizeTemplateName(id);
+    operation.put("description", "Delete pipeline template '" + sanitizedTemplateId + "'");
     operation.put("application", application != null ? application : DEFAULT_APPLICATION);
     operation.put("job", jobs);
 
